@@ -2,8 +2,8 @@
 #include "geeWhiz.h"
 #include <FspTimer.h>   // UNO R4 timer helper
 
-#define HIGH_REF 0.9
-#define LOW_REF -0.9
+#define HIGH_REF 0.1
+#define LOW_REF -0.1
 
 // ================== Global Variables ======
 volatile int angle_counts = 0;       // gear angle
@@ -46,9 +46,9 @@ void setup() {
 // ================== Loop ==================
 void loop() {
   RefServoAng = HIGH_REF;
-  delay(5000);
+  delay(2000);
   RefServoAng = LOW_REF;
-  delay(5000);
+  delay(2000);
 }
 
 // ================== Control ISR ==================

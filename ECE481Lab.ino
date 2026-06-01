@@ -2,22 +2,22 @@
 #include "geeWhiz.h"
 #include <FspTimer.h>   // UNO R4 timer helper
 
-#define HIGH_REF 6.5
-#define LOW_REF -1.5
+#define HIGH_REF 0.9
+#define LOW_REF -0.9
 
 // ================== Global Variables ======
 volatile int angle_counts = 0;       // gear angle
-volatile float ServoAng = 0.0;     // gear angle in rad
-volatile int pos_counts = 0;       // ball position
-volatile float BallPos = 0.0;     // ball position in m
-volatile int Tms = 20;     // 50 ms interrupt interval
-float RefServoAng = 0.0; // target radian from input of step function
-
-// ================== Constants ======
+volatile float ServoAng   = 0.0;     // gear angle in rad
+volatile int   pos_counts = 0;       // ball position
+volatile float BallPos    = 0.0;     // ball position in m
+volatile int          Tms = 10;     // 100 ms interrupt interval
+float voltage = 0.0;
 const float m = -0.0213;  // slope for radian conversion
 const float offset = 120.24;  // offset for radian conversion
-const int32_t T = 10000;   // Period for step function
-const int Kp = -4;
+const float P = -30;  // Gain
+int32_t T = 5000;   // Period for step function
+float RefServoAng = 0.0; // target radian from input of step function
+int timeCounter = 0;
 
 // ================== Pins ==================
 int MOT_PIN = A0;   // motor angle sensor
@@ -46,9 +46,9 @@ void setup() {
 // ================== Loop ==================
 void loop() {
   RefServoAng = HIGH_REF;
-  delay(2000);
+  delay(5000);
   RefServoAng = LOW_REF;
-  delay(2000);
+  delay(5000);
 }
 
 // ================== Control ISR ==================
@@ -61,28 +61,25 @@ void interval_control_code(void) {
   pos_counts = ball;
 
   // Saturator
-  float postSatRef;
-  if (RefServoAng > 0.785398)
-    postSatRef = 0.785398;
-  else if (RefServoAng < -0.785398)
-    postSatRef = -0.785398;
-  else
-    postSatRef = RefServoAng;
+  if (RefServoAng > 0.7)
+    RefServoAng = 0.7;
+  else if (RefServoAng < -0.7)
+    RefServoAng = -0.7;
 
   // Control
   ServoAng = (m * angle_counts + offset) * 3.14159/180; // rad
-  float error = postSatRef - ServoAng;
-  float voltage = Kp*error;
+  float error = RefServoAng - ServoAng;
+  voltage = P*error;
   setMotorVoltage(voltage);
 
   digitalWrite(A5,HIGH);   // A5 can be used to measure cycle time of ISR using an oscilloscope by connecting the scope to the Arduino Box Motor Leads
+  
+  // Timer
+  timeCounter += 10;
+  Serial.print(timeCounter);
   // Serial.print(pos_counts);
-  // Serial.print(",");
-  Serial.print(millis());
-  Serial.print(",");
-  Serial.print(RefServoAng);
   Serial.print(",");
   Serial.println(ServoAng);
+
   digitalWrite(A5,LOW);    // A5 can be used to measure cycle time of ISR using an oscilloscope by connecting the scope to the Arduino Box Motor Leads
- 
 }

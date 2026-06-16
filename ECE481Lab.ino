@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "geeWhiz.h"
 #include <FspTimer.h>   // UNO R4 timer helper
+#include "controller.h"
 
 #define HIGH_REF 0.1
 #define LOW_REF -0.1
@@ -18,6 +19,7 @@ const float P = -30;  // Gain
 int32_t T = 5000;   // Period for step function
 float RefServoAng = 0.0; // target radian from input of step function
 int timeCounter = 0;
+Controller ctrlr;
 
 // ================== Pins ==================
 int MOT_PIN = A0;   // motor angle sensor
@@ -69,7 +71,7 @@ void interval_control_code(void) {
   // Control
   ServoAng = (m * angle_counts + offset) * 3.14159/180; // rad
   float error = RefServoAng - ServoAng;
-  voltage = P*error;
+  voltage = ctrlr.control(error);
   setMotorVoltage(voltage);
 
   digitalWrite(A5,HIGH);   // A5 can be used to measure cycle time of ISR using an oscilloscope by connecting the scope to the Arduino Box Motor Leads

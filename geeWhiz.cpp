@@ -32,11 +32,12 @@ void geeWhizBegin() {
 
 void setMotorVoltage(float volts) {
   // Saturate to ±6 V
-  if (volts >  VMAX) volts =  VMAX;
-  else if (volts < -VMAX) volts = -VMAX;
+  // if (volts >  VMAX) volts =  VMAX;
+  // else if (volts < -VMAX) volts = -VMAX;
 
-  if (volts < 0) volts -= 0.370f;
-  else if (volts > 0) volts += 0.295f;
+  // Stiction
+  if (volts < 0) volts -= 0.680f;
+  else if (volts > 0) volts += 0.150f;
 
   // Direction and duty
   digitalWrite(DIR_PIN, (volts >= 0.0f) ? HIGH : LOW);

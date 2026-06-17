@@ -72,6 +72,8 @@ void interval_control_code(void) {
   ServoAng = (m * angle_counts + offset) * 3.14159/180; // rad
   float error = RefServoAng - ServoAng;
   voltage = ctrlr.control(error);
+  if (ServoAng > 0.8 || ServoAng < -0.8)
+    voltage = 0.0;
   setMotorVoltage(voltage);
 
   digitalWrite(A5,HIGH);   // A5 can be used to measure cycle time of ISR using an oscilloscope by connecting the scope to the Arduino Box Motor Leads
@@ -79,7 +81,8 @@ void interval_control_code(void) {
   // Timer
   timeCounter += 10;
   Serial.print(timeCounter);
-  // Serial.print(pos_counts);
+  Serial.print(",");
+  Serial.print(RefServoAng);
   Serial.print(",");
   Serial.println(ServoAng);
 

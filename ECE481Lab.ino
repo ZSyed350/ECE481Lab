@@ -50,10 +50,8 @@ void setup() {
 
 // ================== Loop ==================
 void loop() {
-  RefServoAng = HIGH_REF;
-  delay(5000);
-  RefServoAng = LOW_REF;
-  delay(5000);
+  RefServoAng = 0.6;
+  delay(2000);
 }
 
 // ================== Control ISR ==================

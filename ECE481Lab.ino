@@ -1,9 +1,10 @@
 #include <Arduino.h>
 #include "geeWhiz.h"
 #include <FspTimer.h>   // UNO R4 timer helper
-#include "controller.h"
+#include "gear_ang_controller.h"
+#include "outer_loop_controller.h"
 
-#define HIGH_REF 0.0
+#define HIGH_REF 0.6
 #define LOW_REF -0.6
 
 // ================== Global Variables ======
@@ -21,8 +22,10 @@ const float k_2 = 0.0609;
 const float P = -30;  // Gain
 int32_t T = 5000;   // Period for step function
 float RefServoAng = 0.0; // target radian from input of step function
+float RefBallPos = 0.15; // m
 int timeCounter = 0;
-Controller ctrlr;
+GearAngController g_ctrl;
+OuterLoopController o_ctrl;
 
 // ================== Pins ==================
 int MOT_PIN = A0;   // motor angle sensor
@@ -50,8 +53,6 @@ void setup() {
 
 // ================== Loop ==================
 void loop() {
-  RefServoAng = 0.6;
-  delay(2000);
 }
 
 // ================== Control ISR ==================
@@ -65,15 +66,19 @@ void interval_control_code(void) {
   pos_counts = ball;
   float effBallPos = m_ball * pos_counts + offset_ball; // Effective Ball Position (in meters)
 
+  // Get RefServoAngle from outerloop controller
+  float ballPosError = RefBallPos - effBallPos;
+  RefServoAng = o_ctrl.control(ballPosError);
+
   // Ref Angle Saturator
   if (RefServoAng > 0.7)
     RefServoAng = 0.7;
   else if (RefServoAng < -0.7)
     RefServoAng = -0.7;
 
-  // Control
-  float error = RefServoAng - ServoAng;
-  voltage = ctrlr.control(error);
+  // Gear Control
+  float gearAngError = RefServoAng - ServoAng;
+  voltage = g_ctrl.control(gearAngError);
   if (ServoAng > 0.8 || ServoAng < -0.8)  // Safety
     voltage = 0.0;
   setMotorVoltage(voltage);

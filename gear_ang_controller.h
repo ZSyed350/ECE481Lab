@@ -1,4 +1,4 @@
-class Controller {
+class GearAngController {
   float k = -3.995866345160179;
   float a_0 = 2.34482758620689655;
   float a_1 = -1.65517241379310345;

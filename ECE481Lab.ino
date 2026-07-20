@@ -53,6 +53,10 @@ void setup() {
 
 // ================== Loop ==================
 void loop() {
+  RefBallPos = 0.15;
+  delay(10000);
+  RefBallPos = 0.18;
+  delay(10000);
 }
 
 // ================== Control ISR ==================
@@ -90,9 +94,7 @@ void interval_control_code(void) {
   // Printing
   Serial.print(timeCounter);
   Serial.print(",");
-  Serial.print(ServoAng);
-  Serial.print(",");
-  Serial.print(beam_angle);
+  Serial.print(RefBallPos);
   Serial.print(",");
   Serial.println(effBallPos);
 

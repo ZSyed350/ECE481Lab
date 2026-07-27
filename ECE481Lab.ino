@@ -52,9 +52,9 @@ void setup() {
 
 // ================== Loop ==================
 void loop() {
-  RefServoAng = 0.1;
+  RefBallPos = 0.1;
   delay(10000);
-  RefServoAng = 0.25;
+  RefBallPos = 0.25;
   delay(10000);
 }
 
@@ -79,10 +79,6 @@ void interval_control_code(void) {
   else if (RefServoAng < -0.7)
     RefServoAng = -0.7;
 
-  // Anti-Ball-Stiction
-  if (RefServoAng < -0.0):
-    RefServoAng -= 0.25;
-
   // Gear Control
   float gearAngError = RefServoAng - ServoAng;
   voltage = g_ctrl.control(gearAngError);
@@ -97,9 +93,9 @@ void interval_control_code(void) {
   // Printing
   Serial.print(timeCounter);
   Serial.print(",");
-  Serial.print(RefServoAng);
+  Serial.print(RefBallPos);
   Serial.print(",");
-  Serial.println(ServoAng);
+  Serial.println(effBallPos);
 
   digitalWrite(A5,LOW);    // A5 can be used to measure cycle time of ISR using an oscilloscope by connecting the scope to the Arduino Box Motor Leads
 }

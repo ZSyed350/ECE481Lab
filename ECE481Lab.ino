@@ -22,7 +22,7 @@ const float k_2 = 0.0609;
 const float P = -30;  // Gain
 int32_t T = 5000;   // Period for step function
 float RefServoAng = 0.0; // target radian from input of step function
-float RefBallPos = 0.15; // m
+float RefBallPos = 0.0; // m
 int timeCounter = 0;
 GearAngController g_ctrl;
 OuterLoopController o_ctrl;
@@ -53,9 +53,9 @@ void setup() {
 
 // ================== Loop ==================
 void loop() {
-  RefBallPos = 0.15;
+  RefBallPos = 0.1;
   delay(10000);
-  RefBallPos = 0.18;
+  RefBallPos = 0.25;
   delay(10000);
 }
 
@@ -93,6 +93,8 @@ void interval_control_code(void) {
 
   // Printing
   Serial.print(timeCounter);
+  Serial.print(",");
+  Serial.print(RefServoAng);
   Serial.print(",");
   Serial.print(RefBallPos);
   Serial.print(",");

@@ -44,18 +44,17 @@ void setup() {
 
   setMotorVoltage(0.0f);
   Serial.println("   ");
-  Serial.println("   geeWhiz Started   -   10 second delay to allow setting up of CoolTerm ");
   Serial.flush();
-  delay(10000);   // 10 sec delay to set up screen and CoolTerm data capture aso ...
+  delay(1000);   // 1 sec delay to set up screen and CoolTerm data capture aso ...
 
   set_control_interval_ms(Tms); // Tms contains interrupt interval in ms  
 }
 
 // ================== Loop ==================
 void loop() {
-  RefBallPos = 0.1;
+  RefServoAng = 0.1;
   delay(10000);
-  RefBallPos = 0.25;
+  RefServoAng = 0.25;
   delay(10000);
 }
 
@@ -80,6 +79,10 @@ void interval_control_code(void) {
   else if (RefServoAng < -0.7)
     RefServoAng = -0.7;
 
+  // Anti-Ball-Stiction
+  if (RefServoAng < -0.0):
+    RefServoAng -= 0.25;
+
   // Gear Control
   float gearAngError = RefServoAng - ServoAng;
   voltage = g_ctrl.control(gearAngError);
@@ -96,9 +99,7 @@ void interval_control_code(void) {
   Serial.print(",");
   Serial.print(RefServoAng);
   Serial.print(",");
-  Serial.print(RefBallPos);
-  Serial.print(",");
-  Serial.println(effBallPos);
+  Serial.println(ServoAng);
 
   digitalWrite(A5,LOW);    // A5 can be used to measure cycle time of ISR using an oscilloscope by connecting the scope to the Arduino Box Motor Leads
 }
